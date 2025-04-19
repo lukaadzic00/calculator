@@ -1,0 +1,37 @@
+* {
+    border-radius: 10px;
+    font-size: 30px;
+    font-weight: 700;
+}
+
+#calculator {
+    background-color: blue;
+    box-sizing: border-box;
+    width: 450px;
+    height: 700px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#display {
+    background-color: black;
+    height: 20%;
+}
+
+#buttons {
+    background-color: aquamarine;
+    flex: 1;
+    height: 80%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-content: space-between;
+}
+
+button {
+    width: 22%;
+    aspect-ratio: 1;
+}
