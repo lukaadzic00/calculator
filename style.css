@@ -25,6 +25,12 @@ body {
 #display {
     background-color: black;
     height: 120px;
+    border: 2px solid white;
+    color: white;
+    font-size: 50px;
+    display: flex;
+    justify-content: end;
+    align-items: end;
 }
 
 #buttons {
