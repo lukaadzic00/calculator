@@ -1,11 +1,50 @@
+function handleNumberInput(e) {
+    if(!num1Finished) {
+        number1 = makeNumber(e, number1);
+        display.textContent = number1;
+        console.log("num1: " + number1);
+    } else if(!num2Finished) {
+        number2 = makeNumber(e, number2);
+        display.textContent = number2;
+        console.log("num2: " + number2);
+        console.log("operation: " + operation);
+    }
+}
+
 function makeNumber(e, num) {
-    let current = e.target.textContent;
+    let current;
+    if(e.type === 'click') {
+        current = e.target.textContent;
+    } else if(e.type === 'keydown') {
+        current = e.key;
+    }
+    
     if(num !== '0') {
         num = num + current;
     } else {
         num = current;
     }
     return num;
+}
+
+function makeOperation(e) {
+    if(operation !== '') {
+        number1 = calculate(number1, number2, operation);
+        display.textContent = number1;
+        number2 = '';
+        num2Finished = false;
+    }
+    
+    if(e.type === 'click') {
+        operation = e.target.textContent;
+    } else if(e.type === 'keydown') {
+        operation = e.key;
+    }
+    
+    num1Finished = true;
+    if(number1 === '') {
+        number1 = '0';
+    }
 }
 
 function backspace(num) {
@@ -31,10 +70,15 @@ function calculate(num1, num2, op) {
     } else if(op === '*') {
         result = +(num1 * num2).toFixed(7);
     } else if(op === '/') {
+        if(num2 === 0) {
+            alert("You can't divide by zero!");
+            return 0;
+        }
         result = +(num1 / num2).toFixed(7);
     }
     return result;
 }
+
 
 let operation = '';
 let number1 = '';
@@ -74,19 +118,7 @@ del.addEventListener('click', () => {
 
 const numbers = document.querySelectorAll('.number');
 for(const number of numbers) {
-
-    number.addEventListener('click', (e) => {
-        if(!num1Finished) {
-            number1 = makeNumber(e, number1);
-            display.textContent = number1;
-            console.log("num1: " + number1);
-        } else if(!num2Finished) {
-            number2 = makeNumber(e, number2);
-            display.textContent = number2;
-            console.log("num2: " + number2);
-            console.log("operation: " + operation);
-        }
-    });
+    number.addEventListener('click', handleNumberInput);
 }
 
 const point = document.querySelector('#point');
@@ -106,29 +138,32 @@ point.addEventListener('click', () => {
 
 const operations = document.querySelectorAll('.operation');
 for(const op of operations) {
-    op.addEventListener('click', (e) => {
-        if(operation !== '') {
-            number1 = calculate(number1, number2, operation);
-            display.textContent = number1;
-            number2 = '';
-            num2Finished = false;
-        }
-        operation = e.target.textContent;
-        num1Finished = true;
-        if(number1 === '') {
-            number1 = '0';
-        }
-    })
+    op.addEventListener('click', (e) => {makeOperation(e);});
 }
 
-const equal = document.querySelector('#equal');
-equal.addEventListener('click', (e) => {
+function handleEqualButton() {
     let result = calculate(number1, number2, operation);    
     display.textContent = result;
 
     number1 = result.toString();
     [number2, operation] = ['', ''];
     [num1Finished, num2Finished] = [false, false];
+}
 
-    console.log("Rezultat: " + result);
+const equal = document.querySelector('#equal');
+equal.addEventListener('click', (e) => handleEqualButton);
+
+// KEYBOARD EVENT
+
+document.addEventListener('keydown', (e) => {
+    let key = e.key;
+    
+    if(key >= '0' && key <= '9') {
+        handleNumberInput(e);
+    } else if(['+', '-', '*', '/'].includes(key)) {
+        makeOperation(e);
+    } else if(key === 'Enter') {
+        handleEqualButton();
+    }
+
 });

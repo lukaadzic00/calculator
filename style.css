@@ -63,6 +63,14 @@ button {
     border: 0px;
 }
 
+button:hover {
+    border: 3px solid greenyellow;
+}
+
+.operation:hover, #equal:hover {
+    border: 3px solid white;
+}
+
 #zero {
     width: 195px;
 }
