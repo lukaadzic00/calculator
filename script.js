@@ -1,32 +1,134 @@
-function makeNumber(e, number) {
-    let num = parseInt(e.target.textContent)
-    number = number * counter + num;
-    const display = document.querySelector('#display');
-    display.textContent = number;
+function makeNumber(e, num) {
+    let current = e.target.textContent;
+    if(num !== '0') {
+        num = num + current;
+    } else {
+        num = current;
+    }
+    return num;
 }
 
-function defineOperation(e) {
-    let operation = e.target.textContent;
+function backspace(num) {
+    if(num !== '' && num !== 0) {
+        num = num.slice(0, -1);
+    }
+
+    if(num === '') {
+        num = 0;
+    }
+    return num;
+}
+
+function calculate(num1, num2, op) {
+    num1 = parseFloat(num1);
+    num2 = parseFloat(num2);
+    let result;
+
+    if(op === '+') {
+        result = +(num1 + num2).toFixed(7);
+    } else if(op === '-') {
+        result = +(num1 - num2).toFixed(7);
+    } else if(op === '*') {
+        result = +(num1 * num2).toFixed(7);
+    } else if(op === '/') {
+        result = +(num1 / num2).toFixed(7);
+    }
+    return result;
 }
 
 let operation = '';
-let number1 = 0;
-let number2 = 0;
-let counter = 10;
+let number1 = '';
+let number2 = '';
+let num1Finished = false;
+let num2Finished = false;
 
+const clear = document.querySelector('#clear');
+clear.addEventListener('click', (e) => {
+    [number1, number2, operation] = ['', '', ''];
+    [num1Finished, num2Finished] = [false, false];
+    display.textContent = 0;
+});
+
+const del = document.querySelector('#backspace');
+del.addEventListener('click', () => {
+    if(!num1Finished) {
+        number1 = backspace(number1);
+        
+        console.log("num1: " + number1);
+        display.textContent = number1;
+
+        if(number1 === 0) {
+            number1 = '';
+        }
+    } else if(!num2Finished) {
+        number2 = backspace(number2);
+
+        console.log("num1: " + number2);
+        display.textContent = number2;
+
+        if(number2 === 0) {
+            number2 = '';
+        }
+    }
+});
 
 const numbers = document.querySelectorAll('.number');
 for(const number of numbers) {
+
     number.addEventListener('click', (e) => {
-        if(!operation) {
-            makeNumber(e, number1);
-        } else {
-            makeNumber(e, number2);
+        if(!num1Finished) {
+            number1 = makeNumber(e, number1);
+            display.textContent = number1;
+            console.log("num1: " + number1);
+        } else if(!num2Finished) {
+            number2 = makeNumber(e, number2);
+            display.textContent = number2;
+            console.log("num2: " + number2);
+            console.log("operation: " + operation);
         }
     });
 }
 
+const point = document.querySelector('#point');
+point.addEventListener('click', () => {
+    if(!num1Finished) {
+        if(!number1.includes('.') && number1 !== '') {
+            number1 = number1 + '.';
+            display.textContent = number1;
+        }
+    } else if(!num2Finished) {
+        if(!number2.includes('.') && number2 !== '') {
+            number2 = number2 + '.';
+            display.textContent = number2;
+        }
+    }
+});
+
 const operations = document.querySelectorAll('.operation');
-for(const operation of operations) {
-    operation.addEventListener('click', defineOperation);
+for(const op of operations) {
+    op.addEventListener('click', (e) => {
+        if(operation !== '') {
+            number1 = calculate(number1, number2, operation);
+            display.textContent = number1;
+            number2 = '';
+            num2Finished = false;
+        }
+        operation = e.target.textContent;
+        num1Finished = true;
+        if(number1 === '') {
+            number1 = '0';
+        }
+    })
 }
+
+const equal = document.querySelector('#equal');
+equal.addEventListener('click', (e) => {
+    let result = calculate(number1, number2, operation);    
+    display.textContent = result;
+
+    number1 = result.toString();
+    [number2, operation] = ['', ''];
+    [num1Finished, num2Finished] = [false, false];
+
+    console.log("Rezultat: " + result);
+});
