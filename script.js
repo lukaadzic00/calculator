@@ -1,11 +1,11 @@
 function handleNumberInput(e) {
     if(!num1Finished) {
         number1 = makeNumber(e, number1);
-        display.textContent = number1;
+        showToDisplay(number1);
         console.log("num1: " + number1);
     } else if(!num2Finished) {
         number2 = makeNumber(e, number2);
-        display.textContent = number2;
+        showToDisplay(number2);
         console.log("num2: " + number2);
         console.log("operation: " + operation);
     }
@@ -27,10 +27,24 @@ function makeNumber(e, num) {
     return num;
 }
 
+function handlePoint() {
+    if(!num1Finished) {
+        if(!number1.includes('.') && number1 !== '') {
+            number1 = number1 + '.';
+            showToDisplay(number1);
+        }
+    } else if(!num2Finished) {
+        if(!number2.includes('.') && number2 !== '') {
+            number2 = number2 + '.';
+            showToDisplay(number2);
+        }
+    }
+}
+
 function makeOperation(e) {
     if(operation !== '') {
         number1 = calculate(number1, number2, operation);
-        display.textContent = number1;
+        showToDisplay(number1);
         number2 = '';
         num2Finished = false;
     }
@@ -44,6 +58,26 @@ function makeOperation(e) {
     num1Finished = true;
     if(number1 === '') {
         number1 = '0';
+    }
+}
+
+function handleBackspace() {
+    if(!num1Finished) {
+        number1 = backspace(number1);
+        console.log("num1: " + number1);
+        showToDisplay(number1);
+
+        if(number1 === 0) {
+            number1 = '';
+        }
+    } else if(!num2Finished) {
+        number2 = backspace(number2);
+        console.log("num1: " + number2);
+        showToDisplay(number2);
+
+        if(number2 === 0) {
+            number2 = '';
+        }
     }
 }
 
@@ -79,6 +113,25 @@ function calculate(num1, num2, op) {
     return result;
 }
 
+function handleEqualButton() {
+    let result = calculate(number1, number2, operation);    
+    showToDisplay(result);
+
+    number1 = result.toString();
+    [number2, operation] = ['', ''];
+    [num1Finished, num2Finished] = [false, false];
+}
+
+function clearAll() {
+    [number1, number2, operation] = ['', '', ''];
+    [num1Finished, num2Finished] = [false, false];
+    showToDisplay(0);
+}
+
+function showToDisplay(num) {
+    display.textContent = num;
+}
+
 
 let operation = '';
 let number1 = '';
@@ -87,83 +140,41 @@ let num1Finished = false;
 let num2Finished = false;
 
 const clear = document.querySelector('#clear');
-clear.addEventListener('click', (e) => {
-    [number1, number2, operation] = ['', '', ''];
-    [num1Finished, num2Finished] = [false, false];
-    display.textContent = 0;
-});
-
 const del = document.querySelector('#backspace');
-del.addEventListener('click', () => {
-    if(!num1Finished) {
-        number1 = backspace(number1);
-        
-        console.log("num1: " + number1);
-        display.textContent = number1;
-
-        if(number1 === 0) {
-            number1 = '';
-        }
-    } else if(!num2Finished) {
-        number2 = backspace(number2);
-
-        console.log("num1: " + number2);
-        display.textContent = number2;
-
-        if(number2 === 0) {
-            number2 = '';
-        }
-    }
-});
-
 const numbers = document.querySelectorAll('.number');
+const point = document.querySelector('#point');
+const operations = document.querySelectorAll('.operation');
+const equal = document.querySelector('#equal');
+
+clear.addEventListener('click', (e) => clearAll());
+
+del.addEventListener('click', (e) => handleBackspace());
+
 for(const number of numbers) {
     number.addEventListener('click', handleNumberInput);
 }
 
-const point = document.querySelector('#point');
-point.addEventListener('click', () => {
-    if(!num1Finished) {
-        if(!number1.includes('.') && number1 !== '') {
-            number1 = number1 + '.';
-            display.textContent = number1;
-        }
-    } else if(!num2Finished) {
-        if(!number2.includes('.') && number2 !== '') {
-            number2 = number2 + '.';
-            display.textContent = number2;
-        }
-    }
-});
+point.addEventListener('click', (e) => handlePoint());
 
-const operations = document.querySelectorAll('.operation');
 for(const op of operations) {
     op.addEventListener('click', (e) => {makeOperation(e);});
 }
 
-function handleEqualButton() {
-    let result = calculate(number1, number2, operation);    
-    display.textContent = result;
+equal.addEventListener('click', (e) => handleEqualButton());
 
-    number1 = result.toString();
-    [number2, operation] = ['', ''];
-    [num1Finished, num2Finished] = [false, false];
-}
-
-const equal = document.querySelector('#equal');
-equal.addEventListener('click', (e) => handleEqualButton);
-
-// KEYBOARD EVENT
-
+// KEYBOARD EVENT //
 document.addEventListener('keydown', (e) => {
     let key = e.key;
     
     if(key >= '0' && key <= '9') {
         handleNumberInput(e);
+    } else if(key === '.') {
+        handlePoint();
     } else if(['+', '-', '*', '/'].includes(key)) {
         makeOperation(e);
     } else if(key === 'Enter') {
         handleEqualButton();
+    } else if(key == 'Backspace') {
+        handleBackspace();
     }
-
 });
